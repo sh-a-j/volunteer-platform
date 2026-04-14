@@ -26,7 +26,7 @@ jobs:
           cd backend
           mvn clean install
 
-  build-frontend:   # ✅ fixed alignment
+  build-frontend:
     runs-on: ubuntu-latest
 
     steps:
@@ -36,10 +36,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+        node-version: '18'
 
       - name: Install Dependencies & Build Frontend
         run: |
           cd frontend
           npm install
-          npm run build
+          npx vite build
