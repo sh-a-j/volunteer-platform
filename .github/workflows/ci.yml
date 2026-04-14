@@ -41,6 +41,6 @@ jobs:
       - name: Install Dependencies & Build Frontend
         run: |
           cd frontend
-          npm install
+          npm ci
           chmod +x node_modules/.bin/vite
-          npx vite build
+          npm run build
