@@ -27,7 +27,7 @@ jobs:
           mvn clean install
 
   build-frontend:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest   # ✅ FIXED INDENTATION
 
     steps:
       - name: Checkout code
@@ -36,10 +36,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-        node-version: '18'
+          node-version: '18'
+          cache: 'npm'
 
-      - name: Install Dependencies & Build Frontend
-        run: |
-          cd frontend
-          npm install
-          npx vite build
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
