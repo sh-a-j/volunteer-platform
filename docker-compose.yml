@@ -1,0 +1,62 @@
+services:
+
+  # ─── MySQL Database ─────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: micro_volunteer_db
+    ports:
+      - "3307:3306"        # Host 3307 → Container 3306 (avoids conflict with local MySQL)
+    volumes:
+      - mysql_data:/var/lib/mysql   # Persist DB data across restarts
+    networks:
+      - volunteer_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s    # Give MySQL 30s to initialize before health checks begin
+
+  # ─── Spring Boot Backend ────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend_container
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/micro_volunteer_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      mysql:
+        condition: service_healthy   # Wait for MySQL healthcheck to PASS before starting
+    networks:
+      - volunteer_network
+    restart: on-failure
+
+  # ─── React Frontend (served by nginx) ───────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_container
+    ports:
+      - "3000:80"          # Access frontend at http://localhost:3000
+    depends_on:
+      - backend
+    networks:
+      - volunteer_network
+
+# ─── Named Volume ────────────────────────────────────────────────────────────
+volumes:
+  mysql_data:
+
+# ─── Network ─────────────────────────────────────────────────────────────────
+networks:
+  volunteer_network:
+    driver: bridge
