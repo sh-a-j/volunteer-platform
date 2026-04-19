@@ -1,0 +1,43 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# render.yaml  —  Render.com Blueprint Configuration
+#
+# Place at ROOT of your repo: volunteer-platform/render.yaml
+#
+# This defines BOTH services so Render knows how to build and run them.
+# Render reads this file automatically when you connect your repo.
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ─── 1. Spring Boot Backend ────────────────────────────────────────────────
+  - type: web
+    name: micro-volunteer-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    autoDeploy: true
+
+    envVars:
+      # These 3 values come from Railway MySQL (you paste them in Render dashboard)
+      - key: DB_URL
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+
+  # ─── 2. React Frontend ─────────────────────────────────────────────────────
+  - type: web
+    name: micro-volunteer-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    autoDeploy: true
+
+    buildArgs:
+      # This tells the frontend where the backend lives in the cloud
+      # MUST match the exact Render backend service URL
+      - key: VITE_API_URL
+        value: https://micro-volunteer-backend.onrender.com

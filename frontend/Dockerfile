@@ -1,35 +1,34 @@
 # ─────────────────────────────────────────────────────────────
-# Stage 1: BUILD — compile the React/Vite app
+# Stage 1: BUILD — Node builds the Vite/React app
 # ─────────────────────────────────────────────────────────────
 FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copy package files
 COPY package.json ./
 
-# Install fresh (no lockfile) — avoids Windows-generated lockfile
-# platform mismatch that causes @rollup/rollup-linux-x64-musl error
+# Install fresh (avoids Windows lockfile / platform mismatch issues)
 RUN npm install
 
-# Copy env for Docker build (sets VITE_API_URL=/api for nginx proxy)
+# VITE_API_URL build arg:
+#   Docker local  → /api  (set via .env.docker)
+#   Render cloud  → https://your-backend.onrender.com (passed as build arg)
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
+# If no build arg passed, fall back to .env.docker
 COPY .env.docker .env
 
-# Copy all source files
 COPY . .
 
-# Build production bundle → outputs to /app/dist
 RUN npm run build
 
 # ─────────────────────────────────────────────────────────────
-# Stage 2: SERVE — nginx serves the built static files
+# Stage 2: SERVE — nginx serves the static build
 # ─────────────────────────────────────────────────────────────
 FROM nginx:alpine
 
-# Copy built React app into nginx html directory
 COPY --from=build /app/dist /usr/share/nginx/html
-
-# Copy custom nginx config (handles React Router + API proxy)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
