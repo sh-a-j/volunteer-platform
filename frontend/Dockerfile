@@ -17,7 +17,7 @@ ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
 # If no build arg passed, fall back to .env.docker
-COPY .env.docker .env
+# COPY .env.docker .env
 
 COPY . .
 
