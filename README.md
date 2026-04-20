@@ -66,3 +66,19 @@ The application follows a client-server architecture:
 ---
 
 ## 6. Project Structure  
+volunteer-platform/
+│── frontend/ # User interface components
+│── backend/ # Server-side logic and APIs
+│── database/ # Database scripts and schema
+│── docs/ # Documentation files
+│── README.md
+
+---
+
+## 7. Futute Enhancements
+
+- ntegration of AI-based recommendation systems
+- Real-time communication between users and organizations
+- Mobile application development
+- Location-based event suggestions
+- Feedback and rating system
