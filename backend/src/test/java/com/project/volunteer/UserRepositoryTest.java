@@ -14,7 +14,7 @@ public class UserRepositoryTest {
 
     @Test
     public void testUserNotNull() {
-        String user = "Shravani";
+        String user = null;
         assertNotNull(user);
     }
 }

@@ -17,7 +17,7 @@
 
 .stat-card.accent {
   border-color: var(--accent);
-  background: var(--accent-dim);
+  background: red;
   display: flex;
   align-items: center;
   justify-content: center;
